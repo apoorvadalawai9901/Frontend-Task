@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dynamic Table Rows</title>
+	<style>
+		:root {
+			font-family: Arial, sans-serif;
+			color: #1f2937;
+			background: #f3f4f6;
+		}
+
+		body {
+			margin: 0;
+			padding: 2rem 1rem;
+		}
+
+		main {
+			width: min(100%, 52rem);
+			margin: 0 auto;
+		}
+
+		h1 {
+			margin-top: 0;
+		}
+
+		.entry-form,
+		.table-wrapper {
+			padding: 1.5rem;
+			background: #ffffff;
+			border: 1px solid #d1d5db;
+			border-radius: 8px;
+		}
+
+		.entry-form {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr) auto;
+			gap: 1rem;
+			align-items: end;
+		}
+
+		label {
+			display: grid;
+			gap: 0.4rem;
+			font-weight: 600;
+		}
+
+		input,
+		select,
+		button {
+			box-sizing: border-box;
+			min-height: 2.5rem;
+			padding: 0.6rem 0.75rem;
+			border: 1px solid #9ca3af;
+			border-radius: 4px;
+			font: inherit;
+		}
+
+		button {
+			border-color: #2563eb;
+			color: #ffffff;
+			background: #2563eb;
+			cursor: pointer;
+			font-weight: 600;
+		}
+
+		button:hover {
+			background: #1d4ed8;
+		}
+
+		.table-wrapper {
+			margin-top: 1.5rem;
+			overflow-x: auto;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			text-align: left;
+		}
+
+		caption {
+			margin-bottom: 1rem;
+			font-size: 1.2rem;
+			font-weight: 700;
+			text-align: left;
+		}
+
+		th,
+		td {
+			padding: 0.8rem;
+			border-bottom: 1px solid #e5e7eb;
+		}
+
+		th {
+			background: #f9fafb;
+		}
+
+		.remove-button {
+			min-height: auto;
+			padding: 0.4rem 0.6rem;
+			border-color: #dc2626;
+			background: #dc2626;
+			font-size: 0.9rem;
+		}
+
+		.remove-button:hover {
+			background: #b91c1c;
+		}
+
+		#message {
+			min-height: 1.25rem;
+			margin: 1rem 0 0;
+			color: #166534;
+		}
+
+		@media (max-width: 700px) {
+			.entry-form {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<h1>Add people to the table</h1>
+
+		<form id="row-form" class="entry-form">
+			<label for="name">
+				Name
+				<input id="name" name="name" type="text" required>
+			</label>
+
+			<label for="email">
+				Email
+				<input id="email" name="email" type="email" required>
+			</label>
+
+			<label for="role">
+				Role
+				<select id="role" name="role" required>
+					<option value="">Select a role</option>
+					<option value="Designer">Designer</option>
+					<option value="Developer">Developer</option>
+					<option value="Manager">Manager</option>
+				</select>
+			</label>
+
+			<button type="submit">Add row</button>
+		</form>
+
+		<p id="message" role="status" aria-live="polite"></p>
+
+		<section class="table-wrapper">
+			<table>
+				<caption>People</caption>
+				<thead>
+					<tr>
+						<th scope="col">Name</th>
+						<th scope="col">Email</th>
+						<th scope="col">Role</th>
+						<th scope="col">Action</th>
+					</tr>
+				</thead>
+				<tbody id="table-body">
+					<tr id="empty-row">
+						<td colspan="4">No rows added yet.</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+	</main>
+
+	<script>
+		const rowForm = document.getElementById('row-form');
+		const tableBody = document.getElementById('table-body');
+		const message = document.getElementById('message');
+
+		rowForm.addEventListener('submit', (event) => {
+			event.preventDefault();
+
+			const formData = new FormData(rowForm);
+			const row = document.createElement('tr');
+
+			if (document.getElementById('empty-row')) {
+				document.getElementById('empty-row').remove();
+			}
+
+			for (const field of ['name', 'email', 'role']) {
+				const cell = document.createElement('td');
+				cell.textContent = formData.get(field);
+				row.appendChild(cell);
+			}
+
+			const actionCell = document.createElement('td');
+			const removeButton = document.createElement('button');
+			removeButton.className = 'remove-button';
+			removeButton.type = 'button';
+			removeButton.textContent = 'Remove';
+			removeButton.addEventListener('click', () => {
+				row.remove();
+				if (tableBody.children.length === 0) {
+					tableBody.innerHTML = '<tr id="empty-row"><td colspan="4">No rows added yet.</td></tr>';
+				}
+			});
+			actionCell.appendChild(removeButton);
+			row.appendChild(actionCell);
+			tableBody.appendChild(row);
+
+			rowForm.reset();
+			message.textContent = 'Row added successfully.';
+		});
+	</script>
+</body>
+</html>

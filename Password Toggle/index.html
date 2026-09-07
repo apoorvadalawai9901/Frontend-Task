@@ -48,12 +48,9 @@
 			font-size: 1rem;
 		}
 
-		.toggle-label {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
+		.toggle-button {
 			margin: 0.75rem 0 1.25rem;
-			font-weight: 400;
+			background: #4b5563;
 		}
 
 		button {
@@ -85,10 +82,9 @@
 		<label for="password">Password</label>
 		<input id="password" name="password" type="password" required>
 
-		<label class="toggle-label" for="show-password">
-			<input id="show-password" type="checkbox">
+		<button id="show-password" class="toggle-button" type="button" aria-pressed="false">
 			Show password
-		</label>
+		</button>
 
 		<button type="submit">Submit</button>
 		<p id="message" role="status" aria-live="polite"></p>
@@ -100,8 +96,11 @@
 		const passwordForm = document.getElementById('password-form');
 		const message = document.getElementById('message');
 
-		showPassword.addEventListener('change', () => {
-			passwordInput.type = showPassword.checked ? 'text' : 'password';
+		showPassword.addEventListener('click', () => {
+			const isVisible = passwordInput.type === 'password';
+			passwordInput.type = isVisible ? 'text' : 'password';
+			showPassword.setAttribute('aria-pressed', String(isVisible));
+			showPassword.textContent = isVisible ? 'Hide password' : 'Show password';
 		});
 
 		passwordForm.addEventListener('submit', (event) => {
